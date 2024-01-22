@@ -1,0 +1,46 @@
+export const StackNav = {
+  Splash: 'Splash',
+  OnBoarding: 'OnBoarding',
+  AuthNavigation: 'AuthNavigation',
+  TabNavigation: 'TabNavigation',
+  CategoriesScreen: 'CategoriesScreen',
+  SalonsDetailScreen: 'SalonsDetailScreen',
+  SalonsListScreen: 'SalonsListScreen',
+  AboutUs: 'AboutUs',
+  AddNewCard: 'AddNewCard',
+  EditProfile: 'EditProfile',
+  FavoritesSalons: 'FavoritesSalons',
+  Language: 'Language',
+  Notification: 'Notification',
+  PaymentMethod: 'PaymentMethod',
+  PrivacyPolicy: 'PrivacyPolicy',
+  ReferAndEarn: 'ReferAndEarn',
+  Chat: 'Chat',
+  VoiceCall: 'VoiceCall',
+  MyBookingDetail: 'MyBookingDetail',
+  SalonDetail: 'SalonDetail',
+  SelectGender: 'SelectGender',
+  SelectDateAndTime: 'SelectDateAndTime',
+  SelectServices: 'SelectServices',
+  YourAppointment: 'YourAppointment',
+  Congratulation: 'Congratulation',
+  PaymentDetail: 'PaymentDetail',
+  CurrentLocation: 'CurrentLocation',
+  FindNearbySalon: 'FindNearbySalon',
+};
+
+export const AuthNav = {
+  SignUpScreen: 'SignUpScreen',
+  OtpVerificationScreen: 'OtpVerificationScreen',
+  LoginScreen: 'LoginScreen',
+  ForgotPasswordScreen: 'ForgotPasswordScreen',
+  CreatePasswordScreen: 'CreatePasswordScreen',
+};
+
+export const TabNav = {
+  Home: 'Home',
+  Location: 'Location',
+  Booking: 'Booking',
+  Message: 'Message',
+  Profile: 'Profile',
+};
