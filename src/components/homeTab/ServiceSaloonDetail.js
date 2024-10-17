@@ -1,30 +1,9 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  FlatList,
-  Text,
-  Alert,
-} from 'react-native';
+import {StyleSheet, TouchableOpacity, View, Text} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Checkbox} from 'react-native-paper';
 // custom imports
-import SaloonSubDetailComponent from './SaloonSubDetailComponent';
 import strings from '../../i18n/strings';
-import {
-  beardData,
-  facialData,
-  hairColorData,
-  hairCutData,
-  makeupData,
-  manicureData,
-  massageData,
-  pedicureData,
-  waxingData,
-} from '../../api/constant';
-import {colors, styles} from '../../themes';
-import CText from '../common/CText';
+import {colors} from '../../themes';
 import {moderateScale} from '../../common/constants';
 import AuthApi from '../../network/AuthApi';
 
@@ -59,7 +38,6 @@ export default function ServiceSaloonDetail() {
     }));
   };
 
-  const [extraData, setExtraData] = useState(false);
   const [details, setDetails] = useState({});
 
   const getApiHairCutData = async () => {
@@ -99,44 +77,7 @@ export default function ServiceSaloonDetail() {
         return null;
     }
   };
-
-  // const services = details.map(detail => {
-  //   return detail.services;
-  // });
-  // const flattenedServices = services.flat().map(service => {
-  //   return service.name;
-  // });
-  // console.log(flattenedServices);
-  // flattenedServices.map(service => {
-  //   console.log(service);
-  // });
-  const RenderItem = () => {
-    return;
-  };
-
-  const SubCategory = ({data}) => {
-    return (
-      <FlatList
-        data={data}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={RenderItem}
-        scrollEnabled={false}
-        estimatedItemSize={200}
-      />
-    );
-  };
-
   return (
-    // <View style={{flex: 1}}>
-    //   {details?.serviceType?.map(item => {
-    //     return (
-    //       <View>
-    //         <Text>{item.name}</Text>
-    //         {item.services.map(it => <Text style={{color: 'green'}}>{it.name}</Text>)}
-    //       </View>
-    //     );
-    //   })}
-    // </View>
     <View style={{flex: 1, marginTop: 15}}>
       {details?.serviceType?.map(item => (
         <View key={item.name} style={localStyles.itemContainer}>
@@ -157,16 +98,10 @@ export default function ServiceSaloonDetail() {
             <View style={localStyles.subItemsContainer}>
               {item.services.map(it => (
                 <TouchableOpacity
+                  key={it.id}
                   onPress={() => handleSelectService(item.name, it.id)}
                   style={localStyles.subItemRow}>
-                  <Text key={it.name} style={localStyles.subItemName}>
-                    {it.name}
-                  </Text>
-                  {/* {selectedServices[item.name] === it.id ? (
-                    <View style={localStyles.radioActive}></View>
-                  ) : (
-                    <View style={localStyles.radioUnActive}></View>
-                  )} */}
+                  <Text style={localStyles.subItemName}>{it.name}</Text>
 
                   <Ionicons
                     name={
