@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import ActionSheet from 'react-native-actions-sheet';
 import {colors, styles} from '../../themes';
 import CText from '../common/CText';
@@ -13,11 +13,28 @@ import {moderateScale} from '../../common/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {salonData} from '../../api/constant';
 import RenderSalonComponents from '../RenderSalonComponents';
+import AuthApi from '../../network/AuthApi';
 
 export default function CategoriesListModal(props) {
   let {sheetRef, selectedCategory} = props;
 
   const closeModal = () => sheetRef.current.hide();
+
+  const [salons, setSalons] = useState([]);
+
+  const getApiSalons = async () => {
+    try {
+      const response = await AuthApi.salons();
+      setSalons(response.data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getApiSalons();
+    //console.log(salons);
+  }, []);
 
   return (
     <ActionSheet ref={sheetRef} containerStyle={styles.sheetContainer}>
@@ -41,7 +58,7 @@ export default function CategoriesListModal(props) {
         </View>
         <View style={localStyles.subContainer}>
           <ScrollView showsVerticalScrollIndicator={false}>
-            {salonData.map((itm, idx) => (
+            {salons.map((itm, idx) => (
               <RenderSalonComponents
                 itm={itm}
                 key={idx.toString()}

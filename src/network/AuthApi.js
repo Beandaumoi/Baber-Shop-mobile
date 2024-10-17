@@ -5,6 +5,8 @@ export const AuthApis = {
   signUp: 'v1/auth/customer/signup',
   check: 'v1/auth/customer/check',
   categories: 'v1/servicetypes?per_page=20&search=&page=1',
+  hairCut: 'v1/merchants/detail?lat=21.056987&long=105.883845&id=1',
+  salons: 'v1/merchants/merchants-nearby?per_page=20&page=1&lat=21.056987&long=105.883845',
 };
 
 class AuthenticationApi {
@@ -22,6 +24,14 @@ class AuthenticationApi {
   }
   categories(params) {
     const url = AuthApis.categories;
+    return Api.request({method: RequestMethod.GET, url, params});
+  }
+  salons(params) {
+    const url = AuthApis.salons;
+    return Api.request({method: RequestMethod.GET, url, params});
+  }
+  hairCut(params) {
+    const url = AuthApis.hairCut;
     return Api.request({method: RequestMethod.GET, url, params});
   }
 }

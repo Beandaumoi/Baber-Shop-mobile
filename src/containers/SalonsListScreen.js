@@ -1,5 +1,5 @@
 import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // custom imports
@@ -8,10 +8,10 @@ import {colors, styles} from '../themes';
 import CHeader from '../components/common/CHeader';
 import {moderateScale} from '../common/constants';
 import CText from '../components/common/CText';
-import {salonData} from '../api/constant';
 import NearbySaloonComponent from '../components/homeTab/NearbySaloonComponent';
 import RenderSalonComponents from '../components/RenderSalonComponents';
 import SortBy from '../components/modals/SortBy';
+import AuthApi from '../network/AuthApi';
 
 export default function SalonsListScreen() {
   const [isSelect, setIsSelect] = useState(0);
@@ -22,6 +22,21 @@ export default function SalonsListScreen() {
   const onPressIcon2 = () => setIsSelect(1);
 
   const onPressSort = () => sortByRef.current?.show();
+
+  const [salons, setSalons] = useState([]);
+
+  const getApiSalons = async () => {
+    try {
+      const response = await AuthApi.salons();
+      setSalons(response.data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getApiSalons();
+  }, []);
 
   return (
     <View style={styles.mainContainerSurface}>
@@ -61,7 +76,7 @@ export default function SalonsListScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={localStyles.mainContainerWithRadius}>
-          {salonData.map((itm, idx) =>
+          {salons.map((itm, idx) =>
             isSelect == 1 ? (
               <NearbySaloonComponent
                 key={idx.toString()}

@@ -15,13 +15,13 @@ import strings from '../../i18n/strings';
 import images from '../../assets/images';
 import {deviceWidth, hp, moderateScale} from '../../common/constants';
 import CTextInput from '../../components/common/CTextInput';
-import {categoryData, homeBannerData, salonData} from '../../api/constant';
+import {homeBannerData} from '../../api/constant';
 import {StackNav} from '../../navigation/NavigationKeys';
 import CategoriesListModal from '../../components/modals/CategoriesListModal';
 import NearbySaloonComponent from '../../components/homeTab/NearbySaloonComponent';
 import RenderSalonComponents from '../../components/RenderSalonComponents';
 import AuthApi from '../../network/AuthApi';
-import { Constants } from '../../constants/Constants';
+import {Constants} from '../../constants/Constants';
 
 export default function HomeTab(props) {
   let {navigation} = props;
@@ -66,15 +66,7 @@ export default function HomeTab(props) {
   };
 
   const [categories, setCategories] = useState([]);
-
-  // const getApiCategories = () => {
-  //   return fetch(
-  //     'http://localhost:3000/v1/servicetypes?per_page=20&search=&page=1',
-  //   )
-  //     .then(response => response.json())
-  //     .then(result => setCategories(result.data.data))
-  //     .catch(err => console.log(err));
-  // };
+  const [salons, setSalons] = useState([]);
 
   const getApiCategories = async () => {
     try {
@@ -85,10 +77,19 @@ export default function HomeTab(props) {
     }
   };
 
+  const getApiSalons = async () => {
+    try {
+      const response = await AuthApi.salons();
+      setSalons(response.data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     getApiCategories();
+    getApiSalons();
   }, []);
-
   return (
     <View style={styles.mainContainerSurface}>
       <View style={localStyles.topHeaderContainer}>
@@ -206,7 +207,7 @@ export default function HomeTab(props) {
                 contentContainerStyle={styles.ph25}
                 showsHorizontalScrollIndicator={false}
                 horizontal>
-                {salonData.map((itm, idx) => (
+                {salons.map((itm, idx) => (
                   <NearbySaloonComponent
                     key={idx.toString()}
                     itm={itm}
@@ -225,7 +226,7 @@ export default function HomeTab(props) {
               <ScrollView
                 contentContainerStyle={styles.ph25}
                 showsHorizontalScrollIndicator={false}>
-                {salonData.map((itm, idx) => (
+                {salons.map((itm, idx) => (
                   <RenderSalonComponents
                     itm={itm}
                     idx={idx}

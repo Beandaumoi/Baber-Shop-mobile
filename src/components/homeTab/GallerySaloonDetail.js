@@ -14,13 +14,26 @@ import {moderateScale} from '../../common/constants';
 import strings from '../../i18n/strings';
 import {saloonImageData} from '../../api/constant';
 import {PlayIcon} from '../../assets/svg';
+import AuthApi from '../../network/AuthApi';
+import { Constants } from '../../constants/Constants';
 
 export default function GallerySaloonDetail() {
   const [isSelect, setIsSelect] = useState(0);
   const [extraData, setExtraData] = useState(false);
+  const [imageData, setImageData] = useState([]);
+
+  const getImageApi = async () => {
+    try {
+      const response = await AuthApi.hairCut();
+      setImageData(response.data.gallery);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     setExtraData(!extraData);
+    getImageApi();
   }, [isSelect]);
 
   const categoryData = [
@@ -64,7 +77,7 @@ export default function GallerySaloonDetail() {
   const RenderItem = ({item}) => {
     return (
       <ImageBackground
-        source={item}
+        source={{uri: Constants.DOMAIN + item.path}}
         imageStyle={{borderRadius: moderateScale(14)}}
         style={localStyles.imageStyle}
         resizeMode={'cover'}>
@@ -81,7 +94,7 @@ export default function GallerySaloonDetail() {
         })}
       </View>
       <FlashList
-        data={saloonImageData}
+        data={imageData}
         extraData={extraData}
         renderItem={RenderItem}
         numColumns={isSelect == 0 && 2}

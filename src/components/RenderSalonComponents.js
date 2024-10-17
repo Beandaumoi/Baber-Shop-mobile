@@ -9,6 +9,7 @@ import {colors, styles} from '../themes';
 import {deviceWidth, hp, moderateScale} from '../common/constants';
 import {DistanceIcon, LocationIcon} from '../assets/svg';
 import {StackNav} from '../navigation/NavigationKeys';
+import {Constants} from '../constants/Constants';
 
 const RenderSalonComponents = ({itm, sheetRef = ''}) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -32,7 +33,10 @@ const RenderSalonComponents = ({itm, sheetRef = ''}) => {
       activeOpacity={0.8}
       onPress={onPressDetailSalon}
       style={localStyles.popularSalonItem}>
-      <Image source={itm.image} style={localStyles.popularSalonImageStyle} />
+      <Image
+        source={{uri: Constants.DOMAIN + itm.gallery[0].path}}
+        style={localStyles.popularSalonImageStyle}
+      />
       <TouchableOpacity
         onPress={onPressLikeButton}
         style={localStyles.likeBgContainer}>
@@ -50,7 +54,7 @@ const RenderSalonComponents = ({itm, sheetRef = ''}) => {
           <View style={styles.rowCenter}>
             <DistanceIcon />
             <CText type={'R14'} style={styles.ml5} color={colors.grayText}>
-              {itm.distance}
+              {itm.distance}km
             </CText>
           </View>
         </View>
@@ -61,7 +65,7 @@ const RenderSalonComponents = ({itm, sheetRef = ''}) => {
             type={'R14'}
             numberOfLines={1}
             color={colors.grayText}>
-            {itm.location}
+            {itm.address}
           </CText>
         </View>
         <View style={styles.rowSpaceBetween}>
@@ -73,9 +77,9 @@ const RenderSalonComponents = ({itm, sheetRef = ''}) => {
               style={styles.mr5}
             />
             <CText type={'R14'}>
-              {itm.rating}
+              {itm.discountCustomer}
               <CText type={'R14'} color={colors.grayText}>
-                {` (${itm.noOfPeopleRated})`}
+                {` (${itm.discountCustomer})`}
               </CText>
             </CText>
           </View>

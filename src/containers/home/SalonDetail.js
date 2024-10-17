@@ -23,6 +23,7 @@ import ServiceSaloonDetail from '../../components/homeTab/ServiceSaloonDetail';
 import GallerySaloonDetail from '../../components/homeTab/GallerySaloonDetail';
 import ReviewSaloonDetail from '../../components/homeTab/ReviewSaloonDetail';
 import {StackNav} from '../../navigation/NavigationKeys';
+import {Constants} from '../../constants/Constants';
 
 export default function SalonDetail({route, navigation}) {
   const item = route.params?.item;
@@ -103,7 +104,9 @@ export default function SalonDetail({route, navigation}) {
   return (
     <View style={localStyles.root}>
       <ScrollView showsVerticalScrollIndicator={false} style={styles.flex}>
-        <ImageBackground source={item.image} style={localStyles.mainImageStyle}>
+        <ImageBackground
+          source={{uri: Constants.DOMAIN + item.gallery[0].path}}
+          style={localStyles.mainImageStyle}>
           <CHeader rightIcon={<RightIcon />} />
         </ImageBackground>
         <View style={localStyles.mainContainerWithRadius}>
@@ -123,7 +126,7 @@ export default function SalonDetail({route, navigation}) {
                 type={'R14'}
                 numberOfLines={1}
                 color={colors.grayText}>
-                {item.location}
+                {item.address}
               </CText>
             </View>
             <View style={styles.rowSpaceBetween}>
@@ -135,9 +138,9 @@ export default function SalonDetail({route, navigation}) {
                   style={styles.mr5}
                 />
                 <CText type={'R14'}>
-                  {item.rating}
+                  {item.discountCustomer}
                   <CText type={'R14'} color={colors.grayText}>
-                    {` (${item.noOfPeopleRated})`}
+                    {` (${item.discountCustomer})`}
                   </CText>
                 </CText>
               </View>

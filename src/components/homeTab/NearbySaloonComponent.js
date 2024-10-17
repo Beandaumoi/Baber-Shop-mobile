@@ -10,6 +10,7 @@ import strings from '../../i18n/strings';
 import {deviceWidth, hp, moderateScale} from '../../common/constants';
 import {StackNav} from '../../navigation/NavigationKeys';
 import {DistanceIcon, LocationIcon} from '../../assets/svg';
+import {Constants} from '../../constants/Constants';
 
 const NearbySaloonComponent = ({itm, isVertical = true}) => {
   const navigation = useNavigation();
@@ -32,11 +33,12 @@ const NearbySaloonComponent = ({itm, isVertical = true}) => {
         localStyles.nearbySalonsItem,
         isVertical && [styles.m5, styles.mh10],
         !isVertical && styles.mv10,
-        {
-          width: isVertical ? deviceWidth - moderateScale(100) : '100%',
-        },
+        {width: isVertical ? deviceWidth - moderateScale(100) : '100%'},
       ]}>
-      <Image source={itm.image} style={localStyles.nearbySalonsImageStyle} />
+      <Image
+        source={{uri: Constants.DOMAIN + itm.gallery[0].path}}
+        style={localStyles.nearbySalonsImageStyle}
+      />
       <TouchableOpacity
         onPress={onPressLikeButton}
         style={localStyles.likeBgContainer}>
@@ -52,7 +54,7 @@ const NearbySaloonComponent = ({itm, isVertical = true}) => {
           <View style={styles.rowCenter}>
             <DistanceIcon />
             <CText type={'R14'} style={styles.ml5} color={colors.grayText}>
-              {itm.distance}
+              {itm.distance}km
             </CText>
           </View>
         </View>
@@ -63,7 +65,7 @@ const NearbySaloonComponent = ({itm, isVertical = true}) => {
             type={'R14'}
             numberOfLines={1}
             color={colors.grayText}>
-            {itm.location}
+            {itm.address}
           </CText>
         </View>
         <View style={styles.rowSpaceBetween}>
@@ -75,9 +77,9 @@ const NearbySaloonComponent = ({itm, isVertical = true}) => {
               style={styles.mr5}
             />
             <CText type={'R14'}>
-              {itm.rating}
+              {itm.discountCustomer}
               <CText type={'R14'} color={colors.grayText}>
-                {` (${itm.noOfPeopleRated})`}
+                {` (${itm.discountCustomer})`}
               </CText>
             </CText>
           </View>
