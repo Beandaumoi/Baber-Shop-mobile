@@ -12,6 +12,7 @@ import {genderDataArr, socialLoginType} from '../../api/constant';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {AuthNav} from '../../navigation/NavigationKeys';
 import CDropdownInput from '../../components/common/CDropdownInput';
+import AuthApi from '../../network/AuthApi';
 
 export default function SignUpScreen(props) {
   let {navigation} = props;
@@ -31,16 +32,44 @@ export default function SignUpScreen(props) {
     setName(text);
   };
   const onChangeMobileNumberFied = text => {
+    console.log('Trước khi cập nhật:', text);
     setMobileNumber(text);
   };
   const onChangeGenderFied = ({value}) => {
     setGender(value);
   };
 
-  const onPressSignUpButton = () => {
-    navigation.navigate(AuthNav.OtpVerificationScreen, {
-      come_from: 'signup',
-    });
+  const onPressSignUpButton = async () => {
+    console.log('Số điện thoại đăng ký:', mobileNumber);
+    const genderValue = gender === 'Male' ? 0 : gender === 'Female' ? 1 : null;
+    const username = mobileNumber.startsWith('0')
+      ? `+84${mobileNumber.slice(1)}`
+      : mobileNumber;
+
+    const params = {
+      email: email,
+      phoneNumber: mobileNumber,
+      username: username,
+      password: password,
+      gender: genderValue,
+      fullName: name,
+    };
+
+    try {
+      const response = await AuthApi.signUp(params);
+
+      if (response.status === 201) {
+        Alert.alert('Success', 'Registration successful');
+        navigation.navigate(AuthNav.OtpVerificationScreen, {
+          come_from: 'signup',
+        });
+      } else {
+        Alert.alert('Error', 'Registration failed');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'An error occurred during registration');
+    }
   };
 
   const onPressLogin = () => {

@@ -24,12 +24,14 @@ import GallerySaloonDetail from '../../components/homeTab/GallerySaloonDetail';
 import ReviewSaloonDetail from '../../components/homeTab/ReviewSaloonDetail';
 import {StackNav} from '../../navigation/NavigationKeys';
 import {Constants} from '../../constants/Constants';
+import AuthApi from '../../network/AuthApi';
 
 export default function SalonDetail({route, navigation}) {
   const item = route.params?.item;
   const [isLiked, setIsLiked] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(strings.about);
   const [extraData, setExtraData] = useState(false);
+  const [details, setDetails] = useState({});
 
   useEffect(() => {
     setExtraData(!extraData);
@@ -41,14 +43,20 @@ export default function SalonDetail({route, navigation}) {
     setSelectedCategory(item);
   };
 
-  const onPressBookNow = () => navigation.navigate(StackNav.SelectGender);
+  const onPressBookNow = () =>
+    navigation.navigate(StackNav.SelectGender, {
+      detail: details,
+      dataBook: {
+        merchantId: details.id,
+      },
+    });
 
   const RenderCategory = () => {
     switch (selectedCategory) {
       case strings.about:
         return <AboutSaloonDetail />;
       case strings.services:
-        return <ServiceSaloonDetail />;
+        return <ServiceSaloonDetail detail={details} />;
       case strings.gallery:
         return <GallerySaloonDetail />;
       case strings.review:
@@ -57,6 +65,23 @@ export default function SalonDetail({route, navigation}) {
         return <AboutSaloonDetail />;
     }
   };
+
+  const getApiHairCutData = async () => {
+    try {
+      const response = await AuthApi.hairCut({
+        id: item.id,
+        lat: '21.056987',
+        long: '105.883845',
+      });
+      setDetails(response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getApiHairCutData();
+  }, []);
 
   const RightIcon = () => {
     return (

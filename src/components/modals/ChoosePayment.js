@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import ActionSheet from 'react-native-actions-sheet';
@@ -19,11 +20,13 @@ import CButton from '../common/CButton';
 import images from '../../assets/images';
 import {paymentMethodData} from '../../api/constant';
 import {StackNav} from '../../navigation/NavigationKeys';
+import AuthApi from '../../network/AuthApi';
 
 export default function ChoosePayment(props) {
   const navigation = useNavigation();
   const [selectedCard, setSelectedCard] = useState(null);
-  let {SheetRef} = props;
+  let {SheetRef, totalPrice, dataBook} = props;
+  console.log(dataBook);
 
   const onPressClose = () => SheetRef.current?.hide();
 
@@ -36,11 +39,39 @@ export default function ChoosePayment(props) {
     }, 400);
   };
 
-  const onPressPayNow = () => {
-    setTimeout(() => {
-      SheetRef.current?.hide();
-      navigation.navigate(StackNav.Congratulation);
-    }, 400);
+  const onPressPayNow = async () => {
+    // setTimeout(() => {
+    //   SheetRef.current?.hide();
+    //   navigation.navigate(StackNav.Congratulation);
+    // }, 400);
+
+    const servicesFormat = dataBook.selectedServices.map(service => service.id);
+
+    const formattedDateTime = formatDateTime(
+      dataBook.selectedDate,
+      dataBook.selectedTime,
+    );
+
+    const params = {
+      merchantId: dataBook.merchantId,
+      serviceIds: servicesFormat,
+      date: formattedDateTime,
+    };
+    console.log('params: ', params);
+
+    try {
+      const response = await AuthApi.booking(params);
+      console.log('response: ', response.status);
+
+      // if (response.status === 201) {
+
+      // } else {
+      //   Alert.alert('Error', 'Registration failed');
+      // }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'An error occurred during registration');
+    }
   };
 
   const RenderCard = ({item}) => {
@@ -120,7 +151,7 @@ export default function ChoosePayment(props) {
             <CText type={'R14'} color={colors.grayText}>
               {strings.total}
             </CText>
-            <CText type={'B16'}>{'$70.00'}</CText>
+            <CText type={'B16'}>{totalPrice || '$0.00'}</CText>
           </View>
           <CButton
             title={strings.payNow}
@@ -133,6 +164,16 @@ export default function ChoosePayment(props) {
       </View>
     </ActionSheet>
   );
+}
+
+function formatDateTime(date, time) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const [hours, minutes] = time.split(':');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 const localStyles = StyleSheet.create({
@@ -151,7 +192,6 @@ const localStyles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderTopLeftRadius: moderateScale(30),
     borderTopRightRadius: moderateScale(30),
-    backgroundColor: colors.white,
     ...styles.ph20,
     ...styles.pb30,
     ...styles.pt20,

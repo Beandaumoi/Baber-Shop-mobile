@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 // custom imports
 import CText from '../../components/common/CText';
@@ -22,12 +23,18 @@ import NearbySaloonComponent from '../../components/homeTab/NearbySaloonComponen
 import RenderSalonComponents from '../../components/RenderSalonComponents';
 import AuthApi from '../../network/AuthApi';
 import {Constants} from '../../constants/Constants';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function HomeTab(props) {
   let {navigation} = props;
+  const inserts = useSafeAreaInsets();
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const categoryRef = useRef(null);
+
+  const snapPoints = React.useMemo(() => ['70%'], []);
+
+  const bottomSheetRef = useRef(null);
 
   const onPressCategory = item => {
     categoryRef.current.show();
@@ -92,7 +99,7 @@ export default function HomeTab(props) {
   }, []);
   return (
     <View style={styles.mainContainerSurface}>
-      <View style={localStyles.topHeaderContainer}>
+      <View style={[localStyles.topHeaderContainer, {paddingTop: inserts.top}]}>
         <Image
           source={images.profileImage}
           resizeMode={'cover'}

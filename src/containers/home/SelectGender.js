@@ -1,9 +1,9 @@
 import {
-  Image,
   ImageBackground,
   StyleSheet,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -18,12 +18,26 @@ import strings from '../../i18n/strings';
 import CButton from '../../components/common/CButton';
 import {StackNav} from '../../navigation/NavigationKeys';
 
-export default function SelectGender({navigation}) {
+export default function SelectGender({navigation, route}) {
+  const {detail, dataBook} = route.params;
+
   const [gender, setGender] = useState(null);
 
   const onPressGender = itm => setGender(itm);
 
-  const onPressContinue = () => navigation.navigate(StackNav.SelectServices);
+  const onPressContinue = () => {
+    if (gender != null) {
+      navigation.navigate(StackNav.SelectServices, {
+        detail: detail,
+        dataBook: {
+          ...dataBook,
+          gender: gender,
+        },
+      });
+    } else {
+      Alert.alert('Selection Required', 'You have to choose your gender!');
+    }
+  };
 
   const RenderGender = ({code, img, title}) => {
     return (

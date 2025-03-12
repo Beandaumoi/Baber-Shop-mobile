@@ -9,8 +9,10 @@ import {
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {FlashList} from '@shopify/flash-list';
+import {useDispatch} from 'react-redux';
 
 // custom imports
+import {logout} from '../../redux/reducer/AuthReducer';
 import {colors, styles} from '../../themes';
 import CText from '../../components/common/CText';
 import strings from '../../i18n/strings';
@@ -23,16 +25,34 @@ import {ACCESS_TOKEN} from '../../utils/keys';
 import {StackNav} from '../../navigation/NavigationKeys';
 
 export default function ProfileTab({navigation}) {
-  const onPressItem = item => {
+  // const onPressItem = item => {
+  //   if (!!item.route) {
+  //     navigation.navigate(item.route);
+  //   } else {
+  //     AsyncStorage.removeItem(ACCESS_TOKEN).then(
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{name: StackNav.AuthNavigation}],
+  //       }),
+  //     );
+  //   }
+  // };
+  const dispatch = useDispatch();
+  const onPressItem = async item => {
     if (!!item.route) {
       navigation.navigate(item.route);
     } else {
-      AsyncStorage.removeItem(ACCESS_TOKEN).then(
-        navigation.reset({
-          index: 0,
-          routes: [{name: StackNav.AuthNavigation}],
-        }),
-      );
+      // Gọi action logout từ Redux
+      dispatch(logout());
+
+      // Xóa token từ AsyncStorage
+      await AsyncStorage.removeItem(ACCESS_TOKEN);
+
+      // Reset navigation về màn hình Auth
+      navigation.reset({
+        index: 0,
+        routes: [{name: StackNav.AuthNavigation}],
+      });
     }
   };
 

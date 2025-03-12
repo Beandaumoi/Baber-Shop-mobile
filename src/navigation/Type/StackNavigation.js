@@ -10,13 +10,12 @@ export default function StackNavigation() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-      }}
-      initialRouteName={StackNav.Splash}>
-      <Stack.Screen name={StackNav.Splash} component={StackRoute.Splash} />
+      }}>
+      {/* <Stack.Screen name={StackNav.Splash} component={StackRoute.Splash} />
       <Stack.Screen
         name={StackNav.OnBoarding}
         component={StackRoute.OnBoarding}
-      />
+      /> */}
       <Stack.Screen
         name={StackNav.AuthNavigation}
         component={StackRoute.AuthNavigation}
