@@ -125,7 +125,6 @@ export const salonData = [
     distance: '2 km',
   },
 ];
-
 export const profileCategoryData = [
   {
     id: 1,
@@ -146,46 +145,46 @@ export const profileCategoryData = [
     route: StackNav.PaymentMethod,
   },
   {
-    id: 3,
+    id: 4,
     name: strings.favoriteSaloon,
     svgICon: <FavoriteSaloon />,
     route: StackNav.FavoritesSalons,
   },
   {
-    id: 3,
+    id: 5,
     name: strings.getNotification,
     svgICon: <GetNotification />,
     route: StackNav.Notification,
   },
   {
-    id: 3,
+    id: 6,
     name: strings.referEarn,
     svgICon: <ReferEarn />,
     route: StackNav.ReferAndEarn,
   },
   {
-    id: 3,
+    id: 7,
     name: strings.changePassword,
     svgICon: <ChangePassword />,
     // route: StackNav.cha,
   },
   {
-    id: 3,
+    id: 8,
     name: strings.privacyPolicy,
     svgICon: <PrivacyPolicy />,
     route: StackNav.PrivacyPolicy,
   },
   {
-    id: 3,
+    id: 9,
     name: strings.aboutUs,
     svgICon: <AboutUs />,
     route: StackNav.AboutUs,
   },
   {
-    id: 3,
+    id: 10,
     name: strings.logOut,
     svgICon: <LogOut />,
-    // route: StackNav.lo,
+    //route: StackNav.lo,
   },
 ];
 
@@ -1420,4 +1419,3 @@ export const addressData = [
     address: 'Market Street, Cityscape, NY',
   },
 ];
-

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 
 // custom imports
 import CText from '../common/CText';
@@ -15,7 +15,31 @@ import {moderateScale} from '../../common/constants';
 import typography from '../../themes/typography';
 import {PromoCode} from '../../assets/svg';
 
-export default function SubDetailComponent({isCoupon = false}) {
+export default function SubDetailComponent({
+  isCoupon = false,
+  dataBook,
+  discount,
+  onTotalCaculated,
+}) {
+  const totalPrice = `$${
+    dataBook?.selectedServices?.reduce(
+      (total, service) => total + service.price,
+      0,
+    ) - discount
+  }.00`;
+
+  const formatDate = dateString => {
+    const date = new Date(dateString);
+    const options = {weekday: 'short', day: '2-digit', month: 'short'};
+    return date.toLocaleDateString('en-US', options);
+  };
+
+  useEffect(() => {
+    if (onTotalCaculated) {
+      onTotalCaculated(totalPrice);
+    }
+  });
+
   const SubContainer = ({title, value}) => {
     return (
       <View style={localStyles.subContainer}>
@@ -50,9 +74,15 @@ export default function SubDetailComponent({isCoupon = false}) {
       style={localStyles.mainContainerWithRadius}>
       <SubContainer
         title={strings.dateAndTime}
-        value={'Mon,12 Aug - 10:00 AM'}
+        value={`${formatDate(dataBook.selectedDate)} - ${
+          dataBook.selectedTime
+        }`}
       />
-      <SubContainer title={strings.Gender} value={strings.male} />
+      {dataBook.gender === 0 ? (
+        <SubContainer title={strings.Gender} value={'Male'} />
+      ) : (
+        <SubContainer title={strings.Gender} value={'Female'} />
+      )}
       <View style={localStyles.serviceListContainer}>
         <View style={localStyles.serviceListTextStyle}>
           <CText type={'B16'} color={colors.textColor}>
@@ -60,11 +90,13 @@ export default function SubDetailComponent({isCoupon = false}) {
           </CText>
         </View>
         <View style={styles.ph15}>
-          <SubTextContainer title={'Man’s Short Hair Cut'} value={'$30'} />
-          <SubTextContainer title={'Hair Spa'} value={'$15'} />
-          <SubTextContainer title={'Oii Treatment'} value={'$25'} />
-          <SubTextContainer title={'CGST'} value={'$5'} />
-          <SubTextContainer title={'SGST'} value={'$5'} />
+          {dataBook.selectedServices.map((service, index) => (
+            <SubTextContainer
+              key={service.index}
+              title={`${service.category} - ${service.name}`}
+              value={`$${service.price}.00`}
+            />
+          ))}
         </View>
       </View>
       {!!isCoupon && (
@@ -88,12 +120,18 @@ export default function SubDetailComponent({isCoupon = false}) {
         </View>
       )}
       <SubTextContainer title={'Total Time'} value={'55 Minutes'} />
-      <SubTextContainer title={'Subtotal'} value={'$85.00'} />
-      <SubTextContainer title={'Coupon Discount'} value={'-$15.00'} />
+      <SubTextContainer
+        title={'Subtotal'}
+        value={`$${dataBook?.selectedServices?.reduce(
+          (total, service) => total + service.price,
+          0,
+        )}.00`}
+      />
+      <SubTextContainer title={'Coupon Discount'} value={`-$${discount}.00`} />
       <View style={localStyles.dividerStyle} />
       <SubTextContainer
         title={strings.total}
-        value={'$70.00'}
+        value={totalPrice}
         color={colors.textColor}
       />
     </ScrollView>
@@ -186,5 +224,10 @@ const localStyles = StyleSheet.create({
     ...styles.center,
     borderTopEndRadius: moderateScale(25),
     borderBottomEndRadius: moderateScale(25),
+  },
+  serviceNone: {
+    marginTop: 10,
+    color: 'red',
+    fontSize: 14,
   },
 });

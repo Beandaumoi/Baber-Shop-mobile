@@ -1,46 +1,11 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  FlatList,
-  Text,
-  Alert,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {StyleSheet, TouchableOpacity, View, Text} from 'react-native';
+import React, {useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Checkbox} from 'react-native-paper';
 // custom imports
-import SaloonSubDetailComponent from './SaloonSubDetailComponent';
-import strings from '../../i18n/strings';
-import {
-  beardData,
-  facialData,
-  hairColorData,
-  hairCutData,
-  makeupData,
-  manicureData,
-  massageData,
-  pedicureData,
-  waxingData,
-} from '../../api/constant';
-import {colors, styles} from '../../themes';
-import CText from '../common/CText';
+import {colors} from '../../themes';
 import {moderateScale} from '../../common/constants';
-import AuthApi from '../../network/AuthApi';
 
-export default function ServiceSaloonDetail() {
-  const [radio, setRadio] = useState({
-    hairCutRadio: '',
-    beardRadio: '',
-    facialRadio: '',
-    hairColorRadio: '',
-    manicureRadio: '',
-    pedicureRadio: '',
-    waxingRadio: '',
-    massageRadio: '',
-    makeupRadio: '',
-  });
-
+export default function ServiceSaloonDetail({detail, icon, onServiceSelect}) {
   const [expandedItems, setExpandedItems] = useState({});
   const [selectedServices, setSelectedServices] = useState({});
 
@@ -52,93 +17,28 @@ export default function ServiceSaloonDetail() {
     }));
   };
 
-  const handleSelectService = (category, serviceId) => {
-    setSelectedServices(prev => ({
-      ...prev,
-      [category]: prev[category] === serviceId ? null : serviceId, // Toggle the selection
-    }));
-  };
+  const handleSelectService = (category, service) => {
+    setSelectedServices(prev => {
+      // Tạo một bản sao của các dịch vụ đã chọn
+      const updateServices = {...prev};
 
-  const [extraData, setExtraData] = useState(false);
-  const [details, setDetails] = useState({});
+      // Kiểm tra xem dịch vụ hiện tại đã được chọn hay chưa
+      if (updateServices[category]?.id === service.id) {
+        // Nếu dịch vụ đã được chọn, xóa dịch vụ đó khỏi danh sách
+        delete updateServices[category]; // Xóa dịch vụ khỏi danh sách
+      } else {
+        // Nếu dịch vụ chưa được chọn, thêm dịch vụ vào danh sách
+        updateServices[category] = {...service, category}; // Thêm dịch vụ mới vào danh sách
+      }
 
-  const getApiHairCutData = async () => {
-    try {
-      const response = await AuthApi.hairCut();
-      setDetails(response.data);
-    } catch (err) {
-      console.log('aaaa', err);
-    }
-  };
-
-  useEffect(() => {
-    getApiHairCutData();
-  }, []);
-
-  const onPressRadio = itm => {
-    switch (itm.category) {
-      case strings.hairCut:
-        return setRadio({...radio, hairCutRadio: itm.id});
-      case strings.beard:
-        return setRadio({...radio, beardRadio: itm.id});
-      case strings.facials:
-        return setRadio({...radio, facialRadio: itm.id});
-      case strings.hairColor:
-        return setRadio({...radio, hairColorRadio: itm.id});
-      case strings.manicure:
-        return setRadio({...radio, manicureRadio: itm.id});
-      case strings.pedicure:
-        return setRadio({...radio, pedicureRadio: itm.id});
-      case strings.waxing:
-        return setRadio({...radio, waxingRadio: itm.id});
-      case strings.massage:
-        return setRadio({...radio, massageRadio: itm.id});
-      case strings.makeup:
-        return setRadio({...radio, makeupRadio: itm.id});
-      default:
-        return null;
-    }
-  };
-
-  // const services = details.map(detail => {
-  //   return detail.services;
-  // });
-  // const flattenedServices = services.flat().map(service => {
-  //   return service.name;
-  // });
-  // console.log(flattenedServices);
-  // flattenedServices.map(service => {
-  //   console.log(service);
-  // });
-  const RenderItem = () => {
-    return;
-  };
-
-  const SubCategory = ({data}) => {
-    return (
-      <FlatList
-        data={data}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={RenderItem}
-        scrollEnabled={false}
-        estimatedItemSize={200}
-      />
-    );
+      onServiceSelect(Object.values(updateServices)); // Gọi hàm callback với danh sách đã cập nhật
+      return updateServices; // Trả về danh sách dịch vụ đã cập nhật
+    });
   };
 
   return (
-    // <View style={{flex: 1}}>
-    //   {details?.serviceType?.map(item => {
-    //     return (
-    //       <View>
-    //         <Text>{item.name}</Text>
-    //         {item.services.map(it => <Text style={{color: 'green'}}>{it.name}</Text>)}
-    //       </View>
-    //     );
-    //   })}
-    // </View>
     <View style={{flex: 1, marginTop: 15}}>
-      {details?.serviceType?.map(item => (
+      {detail?.serviceType?.map(item => (
         <View key={item.name} style={localStyles.itemContainer}>
           <TouchableOpacity
             onPress={() => toggleItem(item.name)}
@@ -155,34 +55,41 @@ export default function ServiceSaloonDetail() {
           {/* Show sub-items if the section is expanded */}
           {expandedItems[item.name] && (
             <View style={localStyles.subItemsContainer}>
-              {item.services.map(it => (
-                <TouchableOpacity
-                  onPress={() => handleSelectService(item.name, it.id)}
-                  style={localStyles.subItemRow}>
-                  <Text key={it.name} style={localStyles.subItemName}>
-                    {it.name}
-                  </Text>
-                  {/* {selectedServices[item.name] === it.id ? (
-                    <View style={localStyles.radioActive}></View>
-                  ) : (
-                    <View style={localStyles.radioUnActive}></View>
-                  )} */}
+              {item.services.map(it => {
+                return icon === true ? (
+                  <TouchableOpacity
+                    key={it.id}
+                    onPress={() => handleSelectService(item.name, it)}
+                    style={localStyles.subItemRow}>
+                    <Text style={localStyles.subItemName}>{it.name}</Text>
 
-                  <Ionicons
-                    name={
-                      selectedServices[item.name] === it.id
-                        ? 'radio-button-on'
-                        : 'radio-button-off'
-                    }
-                    color={
-                      selectedServices[item.name] === it.id
-                        ? colors.primary
-                        : colors.grayText
-                    }
-                    size={moderateScale(22)}
-                  />
-                </TouchableOpacity>
-              ))}
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <Text style={localStyles.subItemName}>{it.price}$</Text>
+                      <Ionicons
+                        name={
+                          selectedServices[item.name]?.id === it.id
+                            ? 'radio-button-on'
+                            : 'radio-button-off'
+                        }
+                        color={
+                          selectedServices[item.name]?.id === it.id
+                            ? colors.primary
+                            : colors.grayText
+                        }
+                        size={moderateScale(22)}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                ) : (
+                  <View style={localStyles.subItemRow} key={it.id}>
+                    <Text style={localStyles.subItemName}>{it.name}</Text>
+
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <Text style={localStyles.subItemName}>{it.price}$</Text>
+                    </View>
+                  </View>
+                );
+              })}
             </View>
           )}
         </View>

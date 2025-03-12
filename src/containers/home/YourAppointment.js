@@ -1,5 +1,5 @@
 import {KeyboardAvoidingView, StyleSheet, View} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 
 // custom imports
 import CHeader from '../../components/common/CHeader';
@@ -12,7 +12,10 @@ import SubDetailComponent from '../../components/homeTab/SubDetailComponent';
 import SalonSubDetail from '../../components/homeTab/SalonSubDetail';
 import ChoosePayment from '../../components/modals/ChoosePayment';
 
-export default function YourAppointment({navigation}) {
+export default function YourAppointment({navigation, route}) {
+  const {detail, dataBook} = route.params;
+
+  const [totalPrice, setTotalPrice] = useState(null);
   const choosePaymentRef = React.useRef(null);
 
   const onPressPayNow = () => choosePaymentRef.current.show();
@@ -26,7 +29,12 @@ export default function YourAppointment({navigation}) {
           keyboardVerticalOffset={isIOS ? moderateScale(104) : null}
           style={[styles.flex]}
           behavior={isIOS ? 'padding' : null}>
-          <SubDetailComponent isCoupon={true} />
+          <SubDetailComponent
+            isCoupon={true}
+            dataBook={dataBook}
+            discount={15}
+            onTotalCaculated={setTotalPrice}
+          />
         </KeyboardAvoidingView>
 
         <View style={localStyles.btnContainer}>
@@ -34,7 +42,7 @@ export default function YourAppointment({navigation}) {
             <CText type={'R14'} color={colors.grayText}>
               {strings.total}
             </CText>
-            <CText type={'B16'}>{'$70.00'}</CText>
+            <CText type={'B16'}>{totalPrice || '$0.00'}</CText>
           </View>
           <CButton
             title={strings.payNow}
@@ -45,7 +53,11 @@ export default function YourAppointment({navigation}) {
           />
         </View>
       </View>
-      <ChoosePayment SheetRef={choosePaymentRef} />
+      <ChoosePayment
+        SheetRef={choosePaymentRef}
+        totalPrice={totalPrice}
+        dataBook={dataBook}
+      />
     </View>
   );
 }

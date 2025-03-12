@@ -1,5 +1,7 @@
 import {Alert, StyleSheet, Switch, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+
 import {colors, styles} from '../../themes';
 import CHeader from '../../components/common/CHeader';
 import strings from '../../i18n/strings';
@@ -11,15 +13,16 @@ import {moderateScale} from '../../common/constants';
 import {socialLoginType} from '../../api/constant';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {AuthNav, StackNav} from '../../navigation/NavigationKeys';
-import {setAuthToken} from '../../utils/asyncstorage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import AuthApi from '../../network/AuthApi';
+import {Login} from '../../redux/action/AuthAction';
 
 export default function LoginScreen(props) {
   let {navigation} = props;
-  const [email, setEmail] = useState('');
+  const [phoneNumber, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [saveValue, setSaveValue] = useState(false);
+
+  const dispatch = useDispatch();
+  const {isAuthenticated, error, loading} = useSelector(state => state.auth);
 
   const onChangeEmailFied = text => {
     setEmail(text);
@@ -28,23 +31,16 @@ export default function LoginScreen(props) {
     setPassword(text);
   };
   const onPressLoginButton = async () => {
-    try {
-      const response = await AuthApi.login({
-        phoneNumber: email,
-        password: password,
-      });
-      if (response.status < 400 && response.data) {
-        await setAuthToken(true);
-        navigation.reset({
-          index: 0,
-          routes: [{name: StackNav.TabNavigation}],
-        });
-      } else {
-        Alert.alert('invalid data');
-      }
-    } catch (error) {
-      console.log(error);
+    if (!phoneNumber || !password) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin đăng nhập');
+      return;
     }
+
+    dispatch(Login({phoneNumber, password}))
+      .unwrap()
+      .catch(error => {
+        Alert.alert('Đăng nhập thất bại', error.message || 'Vui lòng thử lại!');
+      });
   };
 
   const onPressForgotPassword = () => {
@@ -54,6 +50,15 @@ export default function LoginScreen(props) {
   const onPressSignUp = () => {
     navigation.navigate(AuthNav.SignUpScreen);
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigation.reset({
+        index: 0,
+        routes: [{name: StackNav.TabNavigation}],
+      });
+    }
+  }, [isAuthenticated, navigation]);
 
   return (
     <View style={styles.mainContainerSurface}>
@@ -68,7 +73,7 @@ export default function LoginScreen(props) {
           <View style={localStyles.mainContainerWithRadius}>
             <CTextInput
               label={strings.EmailPhoneNumber}
-              value={email}
+              value={phoneNumber}
               onChangeText={onChangeEmailFied}
               placeHolder={strings.EnterEmailPhoneNumber}
               keyBoardType={'email-address'}

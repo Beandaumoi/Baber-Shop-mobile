@@ -1,5 +1,5 @@
-import {ScrollView, StyleSheet, View} from 'react-native';
-import React from 'react';
+import {Alert, ScrollView, StyleSheet, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
 
 // custom imports
 import CButton from '../../components/common/CButton';
@@ -10,15 +10,47 @@ import strings from '../../i18n/strings';
 import {moderateScale} from '../../common/constants';
 import ServiceSaloonDetail from '../../components/homeTab/ServiceSaloonDetail';
 
-export default function SelectServices({navigation}) {
-  const onPressContinue = () => navigation.navigate(StackNav.SelectDateAndTime);
+export default function SelectServices({navigation, route}) {
+  const {detail, dataBook} = route.params;
+  // State to hold selected services
+
+  const [selectedServices, setSelectedServices] = useState([]);
+
+  const handleServiceSelect = services => {
+    setSelectedServices(services);
+  };
+
+  // selectedServices.forEach(service => {
+  //   console.log(`${service.category} - ${service.name}: $${service.price}`);
+  // });
+
+  const onPressContinue = () => {
+    if (selectedServices.length > 0) {
+      navigation.navigate(StackNav.SelectDateAndTime, {
+        detail: detail,
+        dataBook: {
+          ...dataBook,
+          selectedServices: selectedServices, // Convert to Array
+        },
+      });
+    } else {
+      Alert.alert(
+        'Selection Required',
+        'You have to choose at least 1 service!',
+      );
+    }
+  };
 
   return (
     <View style={styles.mainContainerSurface}>
       <CHeader title={'Select Services'} />
       <View style={localStyles.mainContainerWithRadius}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <ServiceSaloonDetail />
+          <ServiceSaloonDetail
+            detail={detail}
+            icon={true}
+            onServiceSelect={handleServiceSelect}
+          />
         </ScrollView>
       </View>
       <View style={{backgroundColor: colors.white}}>

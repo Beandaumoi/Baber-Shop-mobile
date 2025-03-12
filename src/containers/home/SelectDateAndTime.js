@@ -1,5 +1,11 @@
-import {FlatList, StyleSheet, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import {
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Alert,
+} from 'react-native';
+import React, {useState, useEffect} from 'react';
 
 // custom imports
 import CHeader from '../../components/common/CHeader';
@@ -8,51 +14,75 @@ import {colors, styles} from '../../themes';
 import strings from '../../i18n/strings';
 import CText from '../../components/common/CText';
 import {moderateScale} from '../../common/constants';
-import {mayDayData, mayMonthData} from '../../api/constant';
 import {StackNav} from '../../navigation/NavigationKeys';
+import DatePicker from 'react-native-date-picker';
 
-export default function SelectDateAndTime({navigation}) {
-  const [selectedDate, setSelectedDate] = useState(null);
+export default function SelectDateAndTime({navigation, route}) {
+  const {detail, dataBook} = route.params;
+  //Hàm set time
+  const startTime = detail.openAt;
+  const endTime = detail.closeAt;
+  const [timeSlots, setTimeSlots] = useState([]);
+
+  useEffect(() => {
+    if (startTime && endTime) {
+      const timeSlotsArray = [];
+
+      // Chuyển đổi openAt và closeAt thành đối tượng Date
+      let [openHour, openMinute] = startTime.split(':').map(Number);
+      let [closeHour, closeMinute] = endTime.split(':').map(Number);
+
+      let currentTime = new Date();
+      currentTime.setHours(openHour);
+      currentTime.setMinutes(openMinute);
+      currentTime.setSeconds(0);
+
+      const closingTime = new Date();
+      closingTime.setHours(closeHour);
+      closingTime.setMinutes(closeMinute);
+      closingTime.setSeconds(0);
+
+      // Lặp qua và thêm 30 phút cho mỗi lần lặp, dừng khi vượt quá closingTime
+      while (currentTime <= closingTime) {
+        let hours = currentTime.getHours();
+        let minutes = currentTime.getMinutes();
+
+        // Định dạng lại giờ phút thành HH:MM
+        const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes
+          .toString()
+          .padStart(2, '0')}`;
+        timeSlotsArray.push(formattedTime);
+
+        // Thêm 30 phút
+        currentTime.setMinutes(currentTime.getMinutes() + 30);
+      }
+
+      setTimeSlots(timeSlotsArray); // Lưu mảng giờ vào state
+    }
+  }, [startTime, endTime]);
+  //End
+
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
+
+  const [selectedDate, setSelectedDate] = useState(date);
   const [selectedTime, setSelectedTime] = useState(null);
 
-  const onPressDate = item => setSelectedDate(item);
   const onPressTime = item => setSelectedTime(item);
 
-  const onPressContinue = () => navigation.navigate(StackNav.YourAppointment);
-
-  const DateComponent = ({item, index}) => {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() => onPressDate(item)}
-        style={[
-          localStyles.dateOuterContainer,
-          {
-            backgroundColor:
-              selectedDate === item ? colors.white : colors.primaryLight,
-          },
-        ]}>
-        <View
-          style={[
-            localStyles.dateInnerContainer,
-            {
-              backgroundColor:
-                selectedDate === item ? colors.primary : colors.primarySurface,
-            },
-          ]}>
-          <CText
-            type={'M14'}
-            color={selectedDate === item ? colors.white : colors.grayText}>
-            {item.date}
-          </CText>
-        </View>
-        <CText
-          type={'R12'}
-          color={selectedDate === item ? colors.black : colors.grayText}>
-          {item.day}
-        </CText>
-      </TouchableOpacity>
-    );
+  const onPressContinue = () => {
+    if (selectedTime) {
+      navigation.navigate(StackNav.YourAppointment, {
+        detail: detail,
+        dataBook: {
+          ...dataBook,
+          selectedTime,
+          selectedDate,
+        },
+      });
+    } else {
+      Alert.alert('Selection Required', 'You have to choose time!');
+    }
   };
 
   const RenderStatus = ({color, title}) => {
@@ -70,14 +100,14 @@ export default function SelectDateAndTime({navigation}) {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => onPressTime(item.time)}
+        onPress={() => onPressTime(item)}
         style={[
           localStyles.timeContainer,
           {
             backgroundColor:
               item.status == strings.booked
                 ? colors.secondarySurface
-                : selectedTime === item.time
+                : selectedTime === item
                 ? colors.primary
                 : colors.primarySurface,
           },
@@ -87,11 +117,11 @@ export default function SelectDateAndTime({navigation}) {
           color={
             item.status == strings.booked
               ? colors.green
-              : selectedTime === item.time
+              : selectedTime === item
               ? colors.white
               : colors.grayText
           }>
-          {item.time}
+          {item}
         </CText>
       </TouchableOpacity>
     );
@@ -102,20 +132,26 @@ export default function SelectDateAndTime({navigation}) {
       <CHeader title={'Select Date & Time'} />
       <View style={styles.mainContainerWithRadius}>
         <View style={styles.mb10}>
-          <CText
-            type={'R16'}
-            color={colors.white}
-            align={'center'}
-            style={localStyles.monthStyle}>
-            {'August 2022'}
-          </CText>
-          <FlatList
-            data={mayMonthData}
-            renderItem={DateComponent}
-            keyExtractor={(item, index) => index.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.ph10}
+          <TouchableOpacity onPress={() => setOpen(true)}>
+            <CText
+              type={'R16'}
+              color={colors.white}
+              align={'center'}
+              style={localStyles.monthStyle}>
+              {selectedDate.toLocaleDateString('en-GB')}
+            </CText>
+          </TouchableOpacity>
+          <DatePicker
+            minimumDate={new Date()}
+            mode="date"
+            modal
+            open={open}
+            date={selectedDate}
+            onConfirm={newDate => {
+              setOpen(false);
+              setSelectedDate(newDate);
+            }}
+            onCancel={() => setOpen(false)}
           />
         </View>
         <View style={localStyles.mainContainerWithRadius}>
@@ -133,7 +169,7 @@ export default function SelectDateAndTime({navigation}) {
             </View>
           </View>
           <FlatList
-            data={mayDayData}
+            data={timeSlots}
             renderItem={RenderTime}
             numColumns={4}
             keyExtractor={(item, index) => index.toString()}

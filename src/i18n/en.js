@@ -124,7 +124,7 @@ export default {
   pending: 'Pending',
   rebook: 'Rebook',
   dateAndTime: 'Date & Time',
-  male: 'Male',
+  male: 'Men',
   female: 'Women',
   serviceList: 'Service List',
   review: 'Review',
