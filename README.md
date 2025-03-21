@@ -71,6 +71,8 @@ If you can't get this to work, see the [Troubleshooting](https://reactnative.dev
 # Learn More
 # Learn More Test 223
 # Learn More Test 2
+# Learn More Test 3
+# Learn More Test 4
 
 To learn more about React Native, take a look at the following resources:
 
