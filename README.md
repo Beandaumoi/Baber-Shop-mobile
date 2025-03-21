@@ -74,6 +74,7 @@ If you can't get this to work, see the [Troubleshooting](https://reactnative.dev
 # Learn More Test 3
 # Learn More Test 4
 
+oke conflict
 To learn more about React Native, take a look at the following resources:
 
 - [React Native Website](https://reactnative.dev) - learn more about React Native.
